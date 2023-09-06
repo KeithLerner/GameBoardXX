@@ -32,9 +32,9 @@ The first 8 bytes of any GameBoardXX file stores critical Board information.
 		- 64: 0x3634
 			- Decodes to "64" using [ISO/IEC 8859-1](https://en.wikipedia.org/wiki/ISO/IEC_8859-1).
 - Byte 4: Width.
-	- 0-255 -> 1-256
+    - Must be a non-zero, positive integer, less than or equal to 255.
 - Byte 5: Length.
-	- 0-255 -> 1-256
+	- Must be a non-zero, positive integer, less than or equal to 255.
 - Byte 6: Board Modifiers Flags.
 	- Bit 0: Hex Tiles Flag
 	- Bit 1: Full 3D Tiles Flag
@@ -70,7 +70,7 @@ The last 128 bytes of the file store authoring data for the Board.
 
 
 ### Board Body
-The space between Header and Footer is the Body. The body can be up to 65,536 bytes long. The size of any chunk of data for the body is determined by which variant of GameBoardXX is signified in the Header section
+The space between Header and Footer is the Body. The body can be up to 65,025 bytes long. The size of any chunk of data for the body is determined by which variant of GameBoardXX is signified in the Header section
 
 #### GB64
 Designed to contain a large amount of data per tile for complex Game boards.
@@ -239,7 +239,7 @@ Designed to contain a moderate amount of data per tile for game boards.
 - Bit 5: High Ground
 - Bit 6: Elevated Ground
 - Bit 7: Aboveground 
-##### Byte 1: Boundaries and Special Properties byte
+##### Byte 1: Boundaries and Special Properties Compact byte
 - Bits 0-1: Boundaries
 	- 0: Not on Board (NoB) / Not a Tile (Not a part of the visible board or physical playspace)
 	- 1: Out of Bounds (OoB) / Not a Playable Tile (Part of the visible board, not the physical playspace)
