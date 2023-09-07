@@ -23,13 +23,13 @@ public class Board
         }
     }
     // This just shouldn't exist??
-    public byte[] MagicString
+    public byte[] MagicNumber
     {
         get
         {
-            byte[] magicString = new byte[4];
-            Array.Copy(Value, 0, magicString, 0, 4);
-            return magicString;
+            byte[] magicNumber = new byte[4];
+            Array.Copy(Value, 0, magicNumber, 0, 4);
+            return magicNumber;
         }
     }
     // This does not do what it should, also maybe it just shouldn't exist?
@@ -38,7 +38,7 @@ public class Board
         get
         {
             byte[] gameBoardXX = new byte[2];
-            Array.Copy(MagicString, 0, gameBoardXX, 2, 2);
+            Array.Copy(MagicNumber, 0, gameBoardXX, 2, 2);
             return gameBoardXX;
         }
     }
@@ -140,7 +140,7 @@ public class Board
     /// <exception cref="RankException"></exception>
     public bool Verify()
     {
-        if (BitConverter.ToInt16(MagicString, 0) != 0x4D43)
+        if (BitConverter.ToInt16(MagicNumber, 0) != 0x4D43)
             throw new FormatException(
                 "Invalid Board data: Value does not match GameBoard file format.");
 
