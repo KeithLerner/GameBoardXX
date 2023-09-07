@@ -4,54 +4,6 @@ public static class BoardData
 {
 
     #region Core
-    /*
-    //   Could be temp/deleted/movedtoanotherregion/reworked for the 
-    //   gameBoard 32 bit -> gameBoardXX transition
-    //
-    public const uint Environments = 0x000000FF;
-    public const uint EnvironmentNotOnBoard = 0x1;
-    public const uint EnvironmentOutOfBounds = 0x2;
-    public const uint EnvironmentCosmetic = 0x4;
-    public const uint EnvironmentLowGround = 0x8;
-    public const uint EnvironmentLowLinkGround = 0x10;
-    public const uint EnvironmentMidGround = 0x20;
-    public const uint EnvironmentHighLinkGround = 0x40;
-    public const uint EnvironmentHighGround = 0x80;
-    //
-    public const uint BlacklistPlayers = 0x0000FF00;
-    public const uint BlacklistFFAPlayer1 = 0x100;
-    public const uint BlacklistFFAPlayer2 = 0x200;
-    public const uint BlacklistFFAPlayer3 = 0x400;
-    public const uint BlacklistFFAPlayer4 = 0x800;
-    public const uint Blacklist1vXPlayer1 = 0x1000;
-    public const uint Blacklist1vXPlayer2 = 0x2000;
-    public const uint Blacklist1vXPlayer3 = 0x4000;
-    public const uint Blacklist1vXPlayer4 = 0x8000;
-    //
-    public const uint BlacklistTeams = 0x00FF0000;
-    public const uint Blacklist1v2Team1 = 0x10000;
-    public const uint Blacklist1v2Team2 = 0x20000;
-    public const uint Blacklist1v3Team1 = 0x40000;
-    public const uint Blacklist1v3Team2 = 0x80000;
-    public const uint Blacklist2v2Team1 = 0x100000;
-    public const uint Blacklist2v2Team2 = 0x200000;
-    public const uint Blacklist1v1vXIndividuals = 0x400000;
-    public const uint Blacklist1v1vXTeam = 0x800000;
-    //
-    //
-    public const uint Extras = 0xFF000000;
-    public const uint ExtraHillA = 0x1000000;
-    public const uint ExtraHillB = 0x2000000;
-    public const uint ExtraHillC = 0x4000000;
-    public const uint ExtraHomeZone = 0x8000000;
-    public const uint ExtraEndZone = 0x10000000;
-    public const uint ExtraSafeZone = 0x20000000;
-    public const uint ExtraUnlinkedTile = 0x0;
-    public const uint ExtraLinkedTileA = 0x40000000;
-    public const uint ExtraLinkedTileB = 0x80000000;
-    public const uint ExtraLinkedTileC = 0xC0000000;
-    //
-    */
     public enum GameBoardXXVariant { _08, _16, _32, _64 }
     public static byte[] Header(GameBoardXXVariant gbxxv, byte BoardWidth, byte BoardLength, byte modifiers,
     byte bonusFeatures)
@@ -146,6 +98,96 @@ public static class BoardData
     #endregion
 
     #region GameBoard64
+    public const uint GB64Height = 0xFF;
+    public const uint GB64HeightUnderground = 0x1;
+    public const uint GB64HeightLowground = 0x2;
+    public const uint GB64HeightLowMidground = 0x4;
+    public const uint GB64HeightMidground = 0x8;
+    public const uint GB64HeightHighMidground = 0x10;
+    public const uint GB64HeightHighground = 0x20;
+    public const uint GB64HeightElevatedground = 0x40;
+    public const uint GB64HeightAboveground = 0x80;
+    
+    public const uint GB64PlayerBlacklist = 0xFF00;
+    public const uint GB64PlayerBlacklistP1 = 0x100;
+    public const uint GB64PlayerBlacklistP2 = 0x200;
+    public const uint GB64PlayerBlacklistP3 = 0x400;
+    public const uint GB64PlayerBlacklistP4 = 0x800;
+    public const uint GB64PlayerBlacklistFFAP1 = 0x1000;
+    public const uint GB64PlayerBlacklistFFAP2 = 0x2000;
+    public const uint GB64PlayerBlacklistFFAP3 = 0x4000;
+    public const uint GB64PlayerBlacklistFFAP4 = 0x8000;
+    
+    public const uint GB64TeamBlacklist = 0xFF0000;
+    public const uint GB64TeamBlacklistONEvtwo = 0x10000;
+    public const uint GB64TeamBlacklistonevTWO = 0x20000;
+    public const uint GB64TeamBlacklistONEvthree = 0x40000;
+    public const uint GB64TeamBlacklistonevTHREE = 0x80000;
+    public const uint GB64TeamBlacklistTWOvtwo = 0x100000;
+    public const uint GB64TeamBlacklisttwovTWO = 0x200000;
+    public const uint GB64TeamBlacklistIndividuals = 0x400000;
+    public const uint GB64TeamBlacklistTeams = 0x800000;
+
+    public const uint GB64HomeZone = 0xFF000000;
+    public const uint GB64HomeZoneP1 = 0x10000;
+    public const uint GB64HomeZoneP2 = 0x20000;
+    public const uint GB64HomeZoneP3 = 0x40000;
+    public const uint GB64HomeZoneP4 = 0x80000;
+    public const uint GB64HomeZoneTeamA = 0x100000;
+    public const uint GB64HomeZoneTeamB = 0x200000;
+    public const uint GB64HomeZoneTeamC = 0x400000;
+    public const uint GB64HomeZoneAll = 0x800000;
+
+    public const uint GB64EndZone = 0xFF00000000;
+    public const uint GB64EndZoneP1 = 0x100000000;
+    public const uint GB64EndZoneP2 = 0x200000000;
+    public const uint GB64EndZoneP3 = 0x400000000;
+    public const uint GB64EndZoneP4 = 0x800000000;
+    public const uint GB64EndZoneTeamA = 0x1000000000;
+    public const uint GB64EndZoneTeamB = 0x2000000000;
+    public const uint GB64EndZoneTeamC = 0x4000000000;
+    public const uint GB64EndZoneAll = 0x8000000000;
+
+    public const uint GB64SafeZone = 0xFF0000000000;
+    public const uint GB64SafeZoneP1 = 0x10000000000;
+    public const uint GB64SafeZoneP2 = 0x20000000000;
+    public const uint GB64SafeZoneP3 = 0x40000000000;
+    public const uint GB64SafeZoneP4 = 0x80000000000;
+    public const uint GB64SafeZoneTeamA = 0x100000000000;
+    public const uint GB64SafeZoneTeamB = 0x200000000000;
+    public const uint GB64SafeZoneTeamC = 0x400000000000;
+    public const uint GB64SafeZoneAll = 0x800000000000;
+
+    public const uint GB64BoundariesAndBarriers = 0x00FF0000;
+    public const uint GB64BoundariesAndBarriersNotOnBoard = 0x10000;
+    public const uint GB64BoundariesAndBarriersOutOfBounds = 0x20000;
+    public const uint GB64BoundariesAndBarriersHazard = 0x30000;
+    public const uint GB64BoundariesAndBarriersInBounds = 0x40000;
+    public const uint GB64BoundariesAndBarriersZeroCurrencyBarrier = 0x100000;
+    public const uint GB64BoundariesAndBarriersThreeCurrencyBarrier = 0x200000;
+    public const uint GB64BoundariesAndBarriersSixCurrencyBarrier = 0x400000;
+    public const uint GB64BoundariesAndBarriersNineCurrencyBarrier = 0x800000;
+    public const uint GB64BoundariesAndBarriersZeroTurnBarrier = 0x800000;
+    public const uint GB64BoundariesAndBarriersFiveTurnBarrier = 0x800000;
+    public const uint GB64BoundariesAndBarriersTenTurnBarrier = 0x800000;
+    public const uint GB64BoundariesAndBarriersFifteenTurnBarrier = 0x800000;
+    public const uint GB64BoundariesAndBarriersZeroPieceBarrier = 0x800000;
+    public const uint GB64BoundariesAndBarriersTenPieceBarrier = 0x800000;
+    public const uint GB64BoundariesAndBarriersFifteenPieceBarrier = 0x800000;
+    public const uint GB64BoundariesAndBarriersTwentyPieceBarrier = 0x800000;
+
+    public const uint GB64Special = 0xFF00000000000000;
+    public const uint ExtraHillA = 0x100000000000000;
+    public const uint ExtraHillB = 0x200000000000000;
+    public const uint ExtraHillC = 0x400000000000000;
+    public const uint ExtraHomeZone = 0x800000000000000;
+    public const uint ExtraEndZone = 0x100000000000000;
+    public const uint ExtraSafeZone = 0x200000000000000;
+    public const uint ExtraUnlinkedTile = 0x1000000000000000;
+    public const uint ExtraLinkedTileA = 0x2000000000000000;
+    public const uint ExtraLinkedTileB = 0x4000000000000000;
+    public const uint ExtraLinkedTileC = 0x8000000000000000;
+    
     public static byte[] Tile64(byte heightValues, byte blacklistPlayers, 
         byte blacklistTeams, byte homeZones, byte endZones, byte safeZones, 
         byte boundariesBarriers, byte special)
