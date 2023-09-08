@@ -10,13 +10,13 @@ The first 8 bytes of any GameBoardXX file stores critical Board information.
 	- Byte 1: 0x42
 	- Byte 2-3: Format Variant (XX).
 		- 08: 0x3038
-			- Decodes to "08" using [^ISO/IEC8859-1].
+			- Decodes to "08" using ISO/IEC8859-1[^ISO/IEC8859-1].
 		- 16: 0x3136
-			- Decodes to "16" using [^ISO/IEC8859-1].
+			- Decodes to "16" using ISO/IEC8859-1[^ISO/IEC8859-1].
 		- 32: 0x3332
-			- Decodes to "32" using [^ISO/IEC8859-1].
+			- Decodes to "32" using ISO/IEC8859-1[^ISO/IEC8859-1].
 		- 64: 0x3634
-			- Decodes to "64" using [^ISO/IEC8859-1].
+			- Decodes to "64" using ISO/IEC8859-1ISO/IEC8859-1[^ISO/IEC8859-1].
 - Byte 4: Width.
     - Must be a non-zero, positive integer, less than or equal to 255.
 - Byte 5: Length.
@@ -40,18 +40,18 @@ The last 128 bytes of the file store authoring data for the Board.
 - Byte 0: Board Version Number
 	- 0-255 -> 1-256
 - Bytes 1-2: Editor ID
-	- 2 char editor symbol using [^ISO/IEC8859-1].
+	- 2 char editor symbol using ISO/IEC8859-1[^ISO/IEC8859-1].
 	- allows for giving 3rd party editors credit for their part in Board creation.
 - Bytes 3-7: Board Code
 	- 5 char unique Board code for downloading/uploading.
 	- Used to identify and store boards in a public look up table.
 - Bytes 8-68: Board Title
 	- An array containing the characters representing the Board's name
-	- Using [^ISO/IEC8859-1]
+	- Using ISO/IEC8859-1[^ISO/IEC8859-1]
 	- Length of 60 chars
 - Bytes 69-128: Board Author
 	- An array containing the characters representing the author's name
-	- Using [^ISO/IEC8859-1]
+	- Using ISO/IEC8859-1[^ISO/IEC8859-1]
 	- Length of 59 chars
 
 [^ISO/IEC8859-1]: [ISO/IEC 8859-1](https://en.wikipedia.org/wiki/ISO/IEC_8859-1)
