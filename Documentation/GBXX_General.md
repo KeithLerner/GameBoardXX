@@ -1,6 +1,5 @@
 ---
 updated: 2023-09-08
-resources: https://en.wikipedia.org/wiki/ISO/IEC_8859-1
 ---
 ### Board Header
 The first 8 bytes of any GameBoardXX file stores critical Board information. 
@@ -16,7 +15,7 @@ The first 8 bytes of any GameBoardXX file stores critical Board information.
 		- 32: 0x3332
 			- Decodes to "32" using ISO/IEC8859-1[^ISO/IEC8859-1].
 		- 64: 0x3634
-			- Decodes to "64" using ISO/IEC8859-1ISO/IEC8859-1[^ISO/IEC8859-1].
+			- Decodes to "64" using ISO/IEC8859-1[^ISO/IEC8859-1].
 - Byte 4: Width.
     - Must be a non-zero, positive integer, less than or equal to 255.
 - Byte 5: Length.

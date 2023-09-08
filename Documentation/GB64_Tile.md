@@ -1,6 +1,5 @@
 ---
 updated: 2023-09-08
-resources: https://en.wikipedia.org/wiki/ISO/IEC_8859-1
 ---
 #### GB64
 Designed to contain a large amount of data per tile for complex Game boards.

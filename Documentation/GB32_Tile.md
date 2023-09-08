@@ -1,6 +1,5 @@
 ---
 updated: 2023-09-08
-resources: https://en.wikipedia.org/wiki/ISO/IEC_8859-1
 ---
 #### GB32
 Designed to contain a moderate amount of data per tile for complex game boards.
