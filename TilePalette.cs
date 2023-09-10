@@ -30,6 +30,8 @@ public class TilePalette
         // 12 chars / bytes for name
     public readonly byte m_TileSize;
     private readonly byte m_SplotchLength;
+
+    public int TileCount => (m_Value.Length / m_SplotchLength) - 1;
     #endregion
 
     #region Constructors
@@ -77,7 +79,7 @@ public class TilePalette
     #endregion
 
     #region Import and Export
-    public static TilePalette ImportBoardFile(string path = "..\\MyBoard.cbtp")
+    public static TilePalette ImportTilePaletteFile(string path = "..\\MyBoard.cbtp")
     {
         byte[] fileBytes = File.ReadAllBytes(path);
         byte[] valueBytes = new byte[fileBytes.Length - 1];
@@ -85,11 +87,40 @@ public class TilePalette
         return new TilePalette(valueBytes, fileBytes[fileBytes.Length - 1]);
     }
 
-    public void ExportBoardFile(string path = "..\\MyBoard.cbtp")
+    public void ExportTilePaletteFile(string path = "..\\MyBoard.cbtp")
     {
         byte[] fileBytes = new byte[m_Value.Length + 1];
         fileBytes[fileBytes.Length - 1] = m_TileSize;
         File.WriteAllBytes(path, Value);
+    }
+
+    public static TilePalette defaultPalette08
+    {
+        get
+        {
+            return new TilePalette(08);
+        }
+    }
+    public static TilePalette defaultPalette16
+    {
+        get
+        {
+            return new TilePalette(16);
+        }
+    }
+    public static TilePalette defaultPalette32
+    {
+        get
+        {
+            return new TilePalette(32);
+        }
+    }
+    public static TilePalette defaultPalette64
+    {
+        get
+        {
+            return new TilePalette(64);
+        }
     }
     #endregion
 }

@@ -30,6 +30,9 @@ public class GameBoard
         }
     }
 
+    /// <summary>
+    /// The number of bits required to store a tile of this board.
+    /// </summary>
     public byte TileSize
     {
         get
@@ -116,6 +119,37 @@ public class GameBoard
             new byte[60],
             new byte[60] );
         Array.Copy(footer, 0, this.Value, GameBoardData.HeaderLength + 
+            Area, GameBoardData.FooterLength);
+
+        Verify();
+    }
+
+    public GameBoard(GameBoardData.GameBoardXXVariant tileSize, byte BoardWidth, byte BoardLength, byte modifiers = 0b0,
+        byte special = 0b0)
+    {
+        byte tSize = tileSize switch
+        {
+            GameBoardData.GameBoardXXVariant._08 => 8,
+            GameBoardData.GameBoardXXVariant._16 => 16,
+            GameBoardData.GameBoardXXVariant._32 => 32,
+            GameBoardData.GameBoardXXVariant._64 => 64,
+            _ => 0
+        };
+
+        this.Value = new byte[(BoardWidth * BoardLength * tSize) +
+            GameBoardData.HeaderLength + GameBoardData.FooterLength];
+
+        byte[] header = GameBoardData.Header(tileSize, BoardWidth, BoardLength,
+            modifiers, special);
+        Array.Copy(header, 0, this.Value, 0, GameBoardData.HeaderLength);
+
+        byte[] footer = GameBoardData.Footer(
+            0,
+            new byte[2],
+            new byte[5],
+            new byte[60],
+            new byte[60]);
+        Array.Copy(footer, 0, this.Value, GameBoardData.HeaderLength +
             Area, GameBoardData.FooterLength);
 
         Verify();

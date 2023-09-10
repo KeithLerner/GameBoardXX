@@ -9,6 +9,8 @@ using static UnityEngine.EventSystems.EventTrigger;
 public class GameBoardDesigner
 {
     #region Data
+    private TilePalette m_Palette;
+    public TilePalette Palette => m_Palette;
     private GameBoard m_Board;
     public GameBoard Board => m_Board;
 
@@ -22,6 +24,27 @@ public class GameBoardDesigner
     #endregion
 
     #region Constructors
+    public GameBoardDesigner()
+    {
+        m_Board = new GameBoard(8, 8, 8);
+
+        m_Palette = m_Board.TileSize switch
+        {
+            8 => TilePalette.defaultPalette08,
+            16 => TilePalette.defaultPalette16,
+            32 => TilePalette.defaultPalette32,
+            64 => TilePalette.defaultPalette64,
+            _ => new TilePalette(0)
+        };
+
+        m_UndoBuffer = new Stack<byte[]>();
+        m_RedoBuffer = new Stack<byte[]>();
+
+        m_MultiSelect = new HashSet<ushort>();
+
+        m_PaintBrushSettings = new PaintBrushSettings(
+            BrushShape.Circle, 1);
+    }
     public GameBoardDesigner(GameBoard toLoad)
     {
         m_Board = toLoad;
@@ -42,19 +65,19 @@ public class GameBoardDesigner
         m_UndoBuffer.Push(m_Board.Value);
     }
 
-    private void Undo()
+    public void Undo()
     {
         m_RedoBuffer.Push(m_Board.Value);
         m_Board = new GameBoard(m_UndoBuffer.Pop());
     }
 
-    private void Redo()
+    public void Redo()
     {
         m_UndoBuffer.Push(m_Board.Value);
         m_Board = new GameBoard(m_RedoBuffer.Pop());
     }
 
-    private void ClearEditHistory()
+    public void ClearEditHistory()
     {
         m_UndoBuffer.Clear();
         m_RedoBuffer.Clear();
@@ -62,17 +85,22 @@ public class GameBoardDesigner
     #endregion
 
     #region GameBoard Manipulation
-    public enum AppendStyle { Column, Row, Both }
+    public void NewBoard(GameBoardData.GameBoardXXVariant tileSize, byte width, byte length)
+    {
+        m_Board = new GameBoard(tileSize, width, length);
+    }
+
+    public enum Edge { Top, Left, Bottom, Right }
     /// <summary>
     /// Add rows and columns to GameBoard, adjust any existing data to new 
     /// positions.
     /// </summary>
-    /// <param name="appendStyle">The method in which the tiles will be 
-    /// appended.</param>
+    /// <param name="appendTo">The edge which the tiles will be 
+    /// appended to.</param>
     /// <param name="quantity">The number of times to repeat the 
     /// opperation.</param>
     /// <param name="defaultValue"></param>
-    public void AppendToBoard(AppendStyle appendStyle, short quantity = 1)
+    public void AppendToBoard(Edge appendTo, short quantity = 1)
     {
         m_Board.Verify();
 
@@ -83,9 +111,68 @@ public class GameBoardDesigner
         byte l = m_Board.Length;
         byte[,,] array3d = m_Board.OutputByteArray3D();
 
-        m_Board = new GameBoard(m_Board.TileSize, 
-            (byte)(w + (appendStyle == AppendStyle.Row ? 0 : 1)),
-            (byte)(l + (appendStyle == AppendStyle.Column ? 0 : 1)));
+        m_Board = new GameBoard(
+            m_Board.TileSize, 
+            (byte)(w + (((int)appendTo % 2 == 1) ? 0 : 1)),
+            (byte)(l + (((int)appendTo % 2 == 0) ? 0 : 1))
+        );
+
+        for (byte x = 0; x < w; x++)
+        {
+            for (byte y = 0; y < l; y++)
+            {
+                byte[] tile = new byte[m_Board.TileSize];
+                for (int i = 0; i < m_Board.TileSize / 8; i++)
+                {
+                    tile[i] = array3d[x, y, i];
+                }
+                m_Board.PlaceTile(tile, x, y);
+            }
+        }
+
+        if (appendTo == Edge.Left)
+        {
+            ShiftBoard(ShiftStyle.Right);
+        }
+        if (appendTo == Edge.Bottom)
+        {
+            ShiftBoard(ShiftStyle.Up);
+        }
+
+        quantity--;
+        if (quantity > 0)
+        {
+            AppendToBoard(appendTo, quantity);
+        }
+
+        SaveEditState();
+    }
+
+    public void SubtractFromBoard(Edge popFrom, short quantity = 1) 
+    {
+        m_Board.Verify();
+
+        // Copy 1d array to 2d of new dimensions
+        // Populate with data
+        // Perform shift if requested
+        byte w = m_Board.Width;
+        byte l = m_Board.Length;
+        byte[,,] array3d = m_Board.OutputByteArray3D();
+
+        m_Board = new GameBoard(
+            m_Board.TileSize,
+            (byte)(w - (((int)popFrom % 2 == 1) ? 0 : 1)),
+            (byte)(l - (((int)popFrom % 2 == 0) ? 0 : 1))
+        );
+
+        if (popFrom == Edge.Left)
+        {
+            ShiftBoard(ShiftStyle.Left);
+        }
+        if (popFrom == Edge.Bottom)
+        {
+            ShiftBoard(ShiftStyle.Down);
+        }
 
         for (byte x = 0; x < w; x++)
         {
@@ -103,24 +190,13 @@ public class GameBoardDesigner
         quantity--;
         if (quantity > 0)
         {
-            AppendToBoard(appendStyle, quantity);
+            AppendToBoard(popFrom, quantity);
         }
 
         SaveEditState();
     }
 
-    /*
-    public void PopFromBoard() 
-    {
-        throw new NotImplementedException("NOT READY YET!!");
-        // Remove and return rows and columns to the GameBoard,
-        // adjust any existing data to new positions
-
-        SaveEditState();
-    }
-    */
-
-    public enum ShiftStyle { Up, Down, Left, Right }
+    public enum ShiftStyle { Up, Left, Down, Right }
     /// <summary>
     /// Shift all the data in the GameBoard, adjust any existing data to new 
     /// positions.

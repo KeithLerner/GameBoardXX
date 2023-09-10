@@ -67,12 +67,12 @@ public static class GameBoardData
         return header;
     }
 
-    public static byte HeaderModifiersByte(bool specialData, bool hexTiles, bool linkedTiles,
+    public static byte HeaderModifiersByte(bool tallestHeightOnly, bool hexTiles, bool linkedTiles,
     bool wrapWidth, bool wrapLength, bool twoPlayer, bool threePlayer,
     bool fourPlayer)
     {
         return (byte)(
-            (specialData ? 1 : 0) |
+            (tallestHeightOnly ? 1 : 0) |
             (hexTiles ? 1 : 0) << 1 |
             (linkedTiles ? 1 : 0) << 2 |
             (wrapWidth ? 1 : 0) << 3 |
