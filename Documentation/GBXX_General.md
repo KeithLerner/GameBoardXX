@@ -1,5 +1,5 @@
 ---
-updated: 2023-09-08
+updated: 2023-09-10
 ---
 ### Board Header
 The first 8 bytes of any GameBoardXX file stores critical Board information. 
@@ -21,14 +21,26 @@ The first 8 bytes of any GameBoardXX file stores critical Board information.
 - Byte 5: Length.
 	- Must be a non-zero, positive integer, less than or equal to 255.
 - Byte 6: Board Modifiers Flags.
-	- Bit 0: Contains Special Data Flag
+	- Bit 0: Tallest Height Only Flag
+		- When on: Only the highest bit of height is significant.
 	- Bit 1: Hex Tiles Flag
+		- Tiles are hexagon shaped.
+		- This is achieved by alternating column heights. 
+			- Zero-indexed even columns (and zero) remain the same height.
+			- Zero-indexed odd columns are intepreted as a half height up from their coordinate.
 	- Bit 2: Linked/Large Tiles Flag
+		- Tiles may share area and neighboring faces.
+			- Handled with 3 link groups.
 	- Bit 3: Wrap Width Flag
+		- The outermost tiles along the width axis are "connected" to their matching length tile at the opposite edge
 	- Bit 4: Wrap Length Flag
+		- The outermost tiles along the length axis are "connected" to their matching width tile at the opposite edge
 	- Bit 5: 2 Player Flag
+		- Indicates the board is designed for 2 player matches
 	- Bit 6: 3 Player Flag
+		- Indicates the board is designed for 3 player matches
 	- Bit 7: 4 Player Flag
+		- Indicates the board is designed for 4 player matches
 - Byte 7: Bonus Board Features Flags.
 	- Stores custom data about the Board
 	- Intended to be used as a filter in board seach tools.
