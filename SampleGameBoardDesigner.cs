@@ -2,21 +2,40 @@ using System.IO;
 using System.Runtime.InteropServices.ComTypes;
 using UnityEditor;
 using UnityEngine;
+using System;
 using UnityEngine.UIElements;
+using UnityEditor.UIElements;
+using System.Collections.Generic;
 
 public class SampleGameBoardDesigner : EditorWindow
 {
     #region Data
+    private const ushort m_WindowSizeMax = 900;
+    private const ushort m_WindowSizeMin = 512;
+
     GameBoardDesigner m_Designer;
 
-    private bool m_HasBoard = false;
+    public static string DefaultPath => Application.dataPath;
     private string m_Path = "";
     private string m_FileName = "";
+    private Vector2Int m_Dimensions;
+
     GameBoardData.GameBoardXXVariant m_TileSize;
-    private byte m_MaxBoardSize = 255;
+    public byte TileSize
+    {
+        get
+        {
+            return (byte)(m_Designer != null ? m_Designer.Tile.TileSize : 8);
+        }
+    }
+    
     private byte m_Width, m_Length;
+    private byte m_MaxBoardSize = 255;
+    
+    private bool m_HasBoard = false;
     #endregion
-    // Start is called before the first frame update
+
+
     void Test()
     {
         byte[] t64 = GameBoardData.Tile64(0b00001000, 0b0, 0b0, 0b0, 0b0, 0b0, 0b00000011, 0b0);
@@ -50,22 +69,81 @@ public class SampleGameBoardDesigner : EditorWindow
         m_Designer = new GameBoardDesigner(new GameBoard(64, 2, 2));
     }
 
+
+
     [MenuItem("Window/GBXX Editor")]
     public static void ShowWindow()
     {
-        GetWindow<SampleGameBoardDesigner>("Sample GBXX Editor");
+        EditorWindow window = GetWindow<SampleGameBoardDesigner>("Sample GBXX Editor");
+        window.titleContent = new GUIContent("GBXX Sample Editor");
+
+        // Limit size of the window
+        window.minSize = Vector2.one * m_WindowSizeMin;
+        window.maxSize = Vector2.one * m_WindowSizeMax;
     }
 
-    private void OnEnable()
+    private void CreateGUI()
     {
-        m_Designer = new GameBoardDesigner();
         m_TileSize = GameBoardData.GameBoardXXVariant._08;
-        m_Width = 1;
-        m_Length = 1;
+        m_Dimensions = Vector2Int.one;
+
+        // Get a list of all sprites in the project
+        var allObjectGuids = AssetDatabase.FindAssets("t:Sprite");
+        var allObjects = new List<Sprite>();
+        foreach (var guid in allObjectGuids)
+        {
+            allObjects.Add(AssetDatabase.LoadAssetAtPath<Sprite>(AssetDatabase.GUIDToAssetPath(guid)));
+        }
+
+        // Create a two-pane view with the left pane being fixed with
+        var mainView = new TwoPaneSplitView(0, 250, TwoPaneSplitViewOrientation.Horizontal);
+
+        // Add the view to the visual tree by adding it as a child to the root element
+        rootVisualElement.Add(mainView);
+
+        // A TwoPaneSplitView always needs exactly two child elements
+        var boardPane = new TwoPaneSplitView(0, 250, TwoPaneSplitViewOrientation.Vertical);
+        // palette area + quick action area
+        var boardBarArea = new TwoPaneSplitView(0, 250, TwoPaneSplitViewOrientation.Vertical);
+        // palette and quick action
+        var boardMainBar = new TwoPaneSplitView(0, 250, TwoPaneSplitViewOrientation.Horizontal);
+        // palette
+        var boardPalette = new ListView();
+        // quick action
+        var quickActions = new ListView();
+        // set up
+        boardPalette.makeItem = () => new Label();
+        boardPalette.bindItem = (item, index) => { (item as Label).text = allObjects[index].name; };
+        boardPalette.itemsSource = allObjects;
+        quickActions.makeItem = () => new Label();
+        quickActions.bindItem = (item, index) => { (item as Label).text = allObjects[index].name; };
+        quickActions.itemsSource = allObjects;
+        boardBarArea.Add(boardPalette);
+        boardBarArea.Add(quickActions);
+        // toolbar
+        
+        
+        
+        // grid edit area
+        var boardEditArea = new TwoPaneSplitView(0, 250, TwoPaneSplitViewOrientation.Vertical);
+        boardPane.Add(boardBarArea);
+        boardPane.Add(boardEditArea);
+        mainView.Add(boardPane);
+
+
+        var tilePane = new TwoPaneSplitView(0, 250, TwoPaneSplitViewOrientation.Vertical);
+        // current tile inspector area
+            // color + char id
+        // data edit area
+        tilePane.Add();
+        tilePane.Add();
+        mainView.Add(tilePane);
     }
 
     public void OnGUI()
     {
+        if (m_Designer == null) m_HasBoard = false;
+
         GUILayout.Space(10);
 
         GUILayout.Label("File", EditorStyles.boldLabel);
@@ -83,41 +161,50 @@ public class SampleGameBoardDesigner : EditorWindow
 
         GUILayout.Space(2);
 
-        if (GUILayout.Button("Save Game Board"))
+        if (GUILayout.Button("Save Game Tile"))
         {
-            m_Designer.Board.ExportBoardFile(m_Path + "\\" + m_FileName + ".cbxx");
+            m_Designer.Tile.ExportBoardFile(m_Path + "\\" + m_FileName + ".cbxx");
         }
 
         GUILayout.Space(2);
 
-        if (GUILayout.Button("Load Game Board"))
+        if (GUILayout.Button("Load Game Tile"))
         {
-            m_Designer.Board.ImportBoardFile(m_Path + "\\" + m_FileName + ".cbxx");
+            m_Designer.Tile.ImportBoardFile(m_Path + "\\" + m_FileName + ".cbxx");
         }
 
         GUILayout.Space(10);
-
         GUILayout.BeginHorizontal();
         EditorGUILayout.LabelField("Tile Size (bits):");
-        m_TileSize = (GameBoardData.GameBoardXXVariant)
-            EditorGUILayout.EnumPopup(m_TileSize);
+        if (m_Designer == null)
+        {
+            m_TileSize = (GameBoardData.GameBoardXXVariant)
+                EditorGUILayout.EnumPopup(m_TileSize);
+        }
+        else
+        {
+            EditorGUILayout.SelectableLabel(TileSize.ToString());
+        }
         GUILayout.EndHorizontal();
 
         GUILayout.Space(2);
-
-        EditorGUILayout.LabelField("Board Dimensions:");
-        GUILayout.BeginHorizontal();
-        m_Width = (byte)EditorGUILayout.IntField("Width:", 
-            Mathf.Clamp(m_Width, 0, m_MaxBoardSize));
-        m_Length = (byte)EditorGUILayout.IntField("Length:", 
-            Mathf.Clamp(m_Length, 0, m_MaxBoardSize));
-        GUILayout.EndHorizontal();
-
-        if (GUILayout.Button("New Game Board"))
+        GUIStyle dimensionsStyle = new GUIStyle
         {
+            fixedWidth = 50f,
+            wordWrap = true
+        };
+        EditorGUILayout.LabelField("Tile Dimensions:");
+        GUILayout.BeginHorizontal(dimensionsStyle);
+        m_Dimensions = EditorGUILayout.Vector2IntField("Dimensions:", m_Dimensions);
+        m_Width = (byte)Mathf.Clamp(m_Dimensions.x, 0, m_MaxBoardSize);
+        m_Length = (byte)Mathf.Clamp(m_Dimensions.y, 0, m_MaxBoardSize);
+        if (GUILayout.Button("New Game Tile"))
+        {
+            m_Designer = new GameBoardDesigner();
             m_Designer.NewBoard(m_TileSize, m_Width, m_Length);
             m_HasBoard = true;
         }
+        GUILayout.EndHorizontal();
 
         if (m_HasBoard)
         {
@@ -168,27 +255,50 @@ public class SampleGameBoardDesigner : EditorWindow
             GUILayout.Space(10);
             GUIStyle editAreaStyle = new GUIStyle
             {
-                alignment = TextAnchor.MiddleCenter
+
             };
-            GUILayout.BeginArea(new Rect(10, 10, 100, 100), editAreaStyle);
             GUIStyle tileButtonStyle = new GUIStyle
             {
-                fixedWidth = 64,
-                fixedHeight = 64
+                contentOffset = new Vector2(16, -16),
+                fontSize = 32,
+                fixedWidth = 32,
+                fixedHeight = 32
             };
             for (int y = m_Length; y > 0; y--)
             {
                 GUILayout.BeginHorizontal();
-                for (int x = 1; x <= m_Width; x++)
+                for (int x = 0; x < m_Width; x++)
                 {
-                    if (GUILayout.Button("+", tileButtonStyle))
+                    string s = "¤";
+
+                    byte[] tile = m_Designer.Tile.GetTile((byte)x, (byte)y);
+                    byte[] p = new byte[TileSize];
+                    byte[] color = new byte[4];
+                    char[] name = new char[12];
+                    if (m_Designer.Palette.Value != null)
                     {
-                        Debug.Log((x, y) + " Clicked!");
+                        for (int i = 0; i < m_Designer.Palette.TileCount; i++)
+                        {
+                            Array.Copy(m_Designer.Palette.Value, TileSize * i, p, 0, TileSize);
+                            if (tile == p)
+                            {
+                                Array.Copy(p, TileSize, color, 0, 4);
+                                Array.Copy(p, TileSize + 4, name, 0, 12);
+                                tileButtonStyle.fontStyle = FontStyle.Italic;
+                                tileButtonStyle.richText = true;
+                                s = "<color = " + BitConverter.ToString(color).Replace("-", string.Empty) + ">" + name.ToString() + "</color>";
+                                break;
+                            }
+                        }
+                    }
+                    
+                    if (GUILayout.Button(s, tileButtonStyle))
+                    {
+                        Debug.Log((x+1, y) + " Clicked!");
                     }
                 }
                 GUILayout.EndHorizontal();
             }
-            GUILayout.EndArea();
         }
     }
 }

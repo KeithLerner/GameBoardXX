@@ -28,14 +28,7 @@ public class GameBoardDesigner
     {
         m_Board = new GameBoard(8, 8, 8);
 
-        m_Palette = m_Board.TileSize switch
-        {
-            8 => TilePalette.defaultPalette08,
-            16 => TilePalette.defaultPalette16,
-            32 => TilePalette.defaultPalette32,
-            64 => TilePalette.defaultPalette64,
-            _ => new TilePalette(0)
-        };
+        m_Palette = null;
 
         m_UndoBuffer = new Stack<byte[]>();
         m_RedoBuffer = new Stack<byte[]>();
