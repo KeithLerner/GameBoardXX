@@ -3,7 +3,7 @@ updated: 2023-09-08
 resources: https://en.wikipedia.org/wiki/ISO/IEC_8859-1
 ---
 # GameBoardXX
-GameBoardXX is a tile based board creation library for digital board games.
+GameBoardXX is a work-in-progress tile-based board creation library for digital board games.
 
 ## GameBoardXX File Format
 Different GameBoard format variants exist:
