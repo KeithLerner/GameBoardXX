@@ -1,5 +1,5 @@
 ---
-updated: 2023-09-08
+updated: 2023-09-26
 ---
 ## GameBoardXX
 ### Best Practices 
@@ -24,18 +24,31 @@ The first 8 bytes of any GameBoardXX file stores critical Board information.
 			- Decodes to "64" using ISO/IEC8859-1[^ISO/IEC8859-1].
 - Byte 4: Width.
     - Must be a non-zero, positive integer, less than or equal to 255.
-- Byte 5: Height.
+- Byte 5: Length.
 	- Must be a non-zero, positive integer, less than or equal to 255.
-- Byte 6: Length.
-	- Must be a non-zero, positive integer, less than or equal to 255.
-- Byte 7: File Modifiers.
-	- Bit 0: Hex Shaped Tiles Toggle.
+- Byte 6: Board Interpreter Modifiers.
+	- Bit 0: Enforce Branch Routing Toggle.
+		- 0: Free Routing for Tokens.
+		- 1: Pathed Routing for Tokens.
+	- Bit 1: 3D Height Toggle.
+		- 0: Tile height is a multi-bit value between 0-255.
+		- 1: Tile height is limited to the number of bits of height data, with each bit acting as a boolean toggle, indicating whether the height value is present in the tile or not.
+	- Bit 2: Grouped Tiles Toggle.
+		- Allow tiles to be grouped together to act as larger tiles.
+		- Grouped tiles will always take on the attributes of the lowest indexed tiles of the group.
+			- This is based on the body index.
+		- Only 3 groups exist.
+		- Groups are defined as neighboring tiles that share the same group ID.
+			- Sharing a group ID, but not sharing an edge between faces, will lead to a new group being created at the isolated location.
+	- Bit 3: Hex Shaped Tiles Toggle.
+		- 0: Square Shaped Tiles.
+		- 1: Hexagon Shaped Tiles.
 		- Tiles are hexagon shaped on the horizontal plane.
 		- This is achieved by alternating column heights. 
 			- Zero-indexed even columns (and zero) remain the same height.
 			- Zero-indexed odd columns are intepreted as a half height up from their coordinate.
 				- **THERE IS A NAME FOR THIS STYLE OF GRID; REDBLOBGAMES HEX SHIT HAS THE INFO**
-	- Bits 1-2: Board Wrap Enum.
+	- Bits 4-5: Board Wrap Enum.
 		- 0: No Wrapping.
 		- 1: Width.
 			- The outermost tiles (ones that share the same max or min width coordinate) along the width axis are "connected" to their matching length tile at the opposite edge.
@@ -43,17 +56,25 @@ The first 8 bytes of any GameBoardXX file stores critical Board information.
 			- The outermost tiles (ones that share the same max or min length coordinate) along the length axis are "connected" to their matching width tile at the opposite edge.
 		- 3: Wrap Height Flag.
 			- The outermost tiles (ones that share the same max or min height coordinate) along the height axis are "connected" to their matching width tile at the opposite edge.
-	- Bits 3-7: **NEED STUFF HERE THAT MODIFIES HOW THE BOARD IS INTERACTED WITH**
+	- Bits 6-7: Tile Occupancy **?????? DOES THIS WORK????????**
+		- 0: 1 Token per Tile
+		- 1: 1 Token per Team per Tile
+		- 2: No limit on Tokens per Tile
+		- 3: Special Token per Tile limit
+			- For custom definitions
+- Byte 7: Check Sum?
+	- Still exploring this idea. Not even sure one byte would be enough. Might move to footer?
+	- For now, do not use fill this byte with significant data.
 
 
 ### Board Body
 The Body is the space between the Header and the Footer. This space is occupied by tiles.
 
-The size of every tile in the body is determined by which variant of GameBoardXX is indicated in the Header section. The Header section also dictates that a board can not have dimensions greater than 255 in any dimension, meaning the body can range from 1 to 16,581,375 tiles in length. 
+The size of every tile in the body is determined by which variant of GameBoardXX is indicated in the Header section. The Header section also dictates that a board can not have dimensions greater than 255 in any dimension, meaning the body can range from 1 to 65,025 tiles in length. 
 
 File size for a minimum area board is 137 bytes for a board with 8 bit tiles, and 200 bytes for a board with 64 bit tiles. This 'minimum' board would be nothing more than a bloated unsigned integer with built a in header and footer.
 
-File size for a maximum area board is 16,581,375 bytes (about 16MB) for a board with 8 bit tiles, and 1,061,208,000 bytes (about 1GB) for a board with 64 bit tiles.
+File size for a maximum area board is 65,161 bytes (about 65KB) for a board with 8 bit tiles, and 520,336 bytes (about .5MB) for a board with 64 bit tiles.
 
 Find specific details of the different tile variants below:
 - [64 bit tiles](GB64_Tile.md)
